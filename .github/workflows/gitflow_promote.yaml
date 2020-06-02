@@ -1,0 +1,22 @@
+# This workflow routes pull requests to the correct branch
+name: Promote dev branch to master
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  promote-to-master-pr:
+    name: Promote dev branch to master
+    runs-on: ubuntu-latest
+    steps:
+      - name: promote
+        uses: vsoch/pull-request-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.WRITE_BOT_TOKEN }}
+          BRANCH_PREFIX: dev
+          PULL_REQUEST_BRANCH: master
+          PULL_REQUEST_TITLE: Promote dev to master
+          PULL_REQUEST_BODY: |
+            Automatic promotion from dev to master.

@@ -2,7 +2,7 @@
 import click
 
 from ._github import create_github_tags
-from ._util import StringLenRangeParamType, find_parent_versions
+from ._util import StringLenRangeParamType, find_parent_versions, RefPrefixRemover
 
 __all__ = ("__version__", "cli")
 
@@ -22,7 +22,7 @@ _NON_ZERO_STRING_TYPE = StringLenRangeParamType(min=1)
     "--xyz-version",
     required=True,
     envvar=("INPUT_XYZ-VERSION", "GITHUB_REF",),
-    type=_NON_ZERO_STRING_TYPE,
+    type=RefPrefixRemover(min=1),
 )
 @click.option(
     "--commitish",

@@ -6,7 +6,7 @@ from typing import Iterator
 
 from click.types import StringParamType
 
-__all__ = ("find_parent_versions", "StringLenRangeParamType")
+__all__ = ("find_parent_versions", "StringLenRangeParamType", "RefPrefixRemover")
 
 
 def find_parent_versions(*, xyz_version: str, version_separator: str) -> Iterator[str]:
@@ -60,3 +60,17 @@ class StringLenRangeParamType(StringParamType):
             )
 
         return rv
+
+
+class RefPrefixRemover(StringLenRangeParamType):
+    """A parameter that works similar to :data:`StringLenRangeParamType`
+    but removes the "refs/heads/" prefix.
+    """
+    name = "refs prefix remover"
+    _remove_prefix = "refs/heads/"
+
+    def convert(self, value, param, ctx):
+        rv = StringParamType.convert(self, value, param, ctx)
+        if rv.startswith(self._remove_prefix):
+            rv = rv[len(self._remove_prefix):]
+        return StringLenRangeParamType.convert(self, rv, param, ctx)

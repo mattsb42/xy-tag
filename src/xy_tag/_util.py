@@ -2,14 +2,14 @@
 Utility functions.
 """
 import itertools
-from typing import Iterator
+from typing import Sequence
 
 from click.types import StringParamType
 
 __all__ = ("find_parent_versions", "StringLenRangeParamType", "RefPrefixRemover")
 
 
-def find_parent_versions(*, xyz_version: str, version_separator: str) -> Iterator[str]:
+def find_parent_versions(*, xyz_version: str, version_separator: str) -> Sequence[str]:
     """Given an X.Y.Z version string, find the X and X.Y versions.
 
     :param xyz_version: X.Y.Z version string
@@ -25,10 +25,10 @@ def find_parent_versions(*, xyz_version: str, version_separator: str) -> Iterato
         return ()
 
     parent_members = xyz_version.split(version_separator)[:-1]
-    return map(
+    return tuple(map(
         lambda x: version_separator.join(x),
         itertools.accumulate(map(list, parent_members)),
-    )
+    ))
 
 
 class StringLenRangeParamType(StringParamType):

@@ -16,43 +16,53 @@ _NON_ZERO_STRING_TYPE = StringLenRangeParamType(min=1)
     "--github-token",
     required=True,
     envvar=("INPUT_GITHUB-TOKEN",),
+    show_envvar=True,
     type=_NON_ZERO_STRING_TYPE,
 )
 @click.option(
     "--xyz-version",
     required=True,
     envvar=("INPUT_XYZ-VERSION", "GITHUB_REF",),
+    show_envvar=True,
     type=RefPrefixRemover(min=1),
 )
 @click.option(
     "--commitish",
     required=True,
     envvar=("INPUT_COMMITISH", "GITHUB_SHA",),
+    show_envvar=True,
     type=_NON_ZERO_STRING_TYPE,
 )
 @click.option(
     "--github-repository",
     required=True,
     envvar=("INPUT_GITHUB-REPOSITORY", "GITHUB_REPOSITORY",),
+    show_envvar=True,
     type=_NON_ZERO_STRING_TYPE,
 )
 @click.option(
     "--dry-run",
     envvar=("INPUT_DRY-RUN",),
-    default="false",
-    type=click.types.BOOL,
+    show_envvar=True,
+    type=bool,
     is_flag=True,
+    flag_value=True,
+    show_default=True,
 )
 @click.option(
     "--version-separator",
     envvar=("INPUT_VERSION-SEPARATOR",),
+    show_envvar=True,
     default=".",
+    show_default=True,
     type=_NON_ZERO_STRING_TYPE,
 )
 @click.option(
     "--beta-separator",
     envvar=("INPUT_BETA-SEPARATOR",),
+    show_envvar=True,
     default="-",
+    show_default=True,
     type=_NON_ZERO_STRING_TYPE,
 )
 def cli(
@@ -71,9 +81,12 @@ def cli(
     version_tags = find_parent_versions(
         xyz_version=xyz_version, version_separator=version_separator
     )
+    click.echo(f"Found {len(version_tags)} new tags to create:")
+    for tag in version_tags:
+        click.echo(tag)
+
     if dry_run:
-        for tag in version_tags:
-            click.echo(tag)
+        click.echo("This is a dry run. No tags were created.")
         return
 
     create_github_tags(

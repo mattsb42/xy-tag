@@ -2,13 +2,13 @@
 import click
 
 from ._github import create_github_tags
-from ._util import StringLenRangeParamType, find_parent_versions, RefPrefixRemover
+from ._util import RefPrefixRemover, StringLenRangeParamType, find_parent_versions
 
 __all__ = ("__version__", "cli")
 
 __version__ = "0.0.1"
 
-_NON_ZERO_STRING_TYPE = StringLenRangeParamType(min=1)
+_NON_ZERO_STRING_TYPE = StringLenRangeParamType(min_len=1)
 
 
 @click.command()
@@ -24,7 +24,7 @@ _NON_ZERO_STRING_TYPE = StringLenRangeParamType(min=1)
     required=True,
     envvar=("INPUT_XYZ-VERSION", "GITHUB_REF",),
     show_envvar=True,
-    type=RefPrefixRemover(min=1),
+    type=RefPrefixRemover(min_len=1),
 )
 @click.option(
     "--commitish",
@@ -74,6 +74,7 @@ def cli(
     version_separator: str,
     beta_separator: str,
 ):
+    """Create parent tags from an X.Y.Z version."""
     if beta_separator in xyz_version:
         click.echo("Skipping beta version!")
         return
@@ -89,9 +90,12 @@ def cli(
         click.echo("This is a dry run. No tags were created.")
         return
 
+    owner, repo = github_repository.split("/", 1)
+
     create_github_tags(
         github_token=github_token,
-        github_repository=github_repository,
+        github_owner=owner,
+        github_repository=repo,
         tags=version_tags,
         commitish=commitish,
     )
